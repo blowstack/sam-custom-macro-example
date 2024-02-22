@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-custom-macro-example - example of a applying custom macro in SAM
+
+Resources:
+  CustomFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/customFunction
+      Handler: app.customFunction
+      Runtime: nodejs18.x
+      Environment:
+        Variables:
+          DynamicVariableFromMacro:
+            'Fn::Transform':
+              Name: 'ArnGenerator'
+              Parameters:
+                AccountId: 'AccountB'
+                Name: 'AccountBRoleName'
+                ArnType: 'Role'
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - app.ts

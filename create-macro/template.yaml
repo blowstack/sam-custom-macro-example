@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-custom-macro-example - example of a declaring custom macro in SAM
+
+Resources:
+  CustomMacroLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/customMacro
+      Handler: app.convertToARN
+      Runtime: nodejs18.x
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - app.ts
+  Macro:
+    Type: AWS::CloudFormation::Macro
+    Properties:
+      Name: 'ArnGenerator'
+      Description: Combine account id and name into full ARN
+      FunctionName: !GetAtt CustomMacroLambdaFunction.Arn
